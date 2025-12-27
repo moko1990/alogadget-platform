@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.turbo
+.env
+postgres_data
+redis_data
+uploads
+npm-debug.log
+pnpm-debug.log

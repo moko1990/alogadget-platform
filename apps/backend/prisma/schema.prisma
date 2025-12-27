@@ -1,0 +1,162 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+enum UserRole {
+    CUSTOMER
+    ADMIN
+    VENDOR
+    ACCOUNTANT
+}
+
+enum VendorStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+model User {
+    id           String    @id @default(uuid())
+    email        String    @unique
+    phone        String?   @unique
+    passwordHash String // نام فیلد را دقیق کردیم
+    firstName    String?
+    lastName     String?
+    role         UserRole  @default(CUSTOMER)
+    isActive     Boolean   @default(true)
+    lastLogin    DateTime?
+    createdAt    DateTime  @default(now())
+    updatedAt    DateTime  @updatedAt
+
+    // روابط
+    vendorProfile Vendor?
+    refreshTokens RefreshToken[]
+
+    @@map("users")
+}
+
+model Category {
+    id          String  @id @default(uuid())
+    name        String
+    slug        String  @unique
+    description String?
+    isActive    Boolean @default(true)
+
+    parentId String?
+    parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+    children Category[] @relation("CategoryHierarchy")
+
+    products Product[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([slug])
+    @@index([parentId])
+    @@map("categories")
+}
+
+model Vendor {
+    id         String       @id @default(uuid())
+    storeName  String
+    status     VendorStatus @default(PENDING)
+    commission Float        @default(0.0) // درصد کمیسیون
+
+    userId String @unique
+    user   User   @relation(fields: [userId], references: [id])
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    products  Product[]
+
+    @@map("vendors")
+}
+
+enum ProductStatus {
+    DRAFT
+    PUBLISHED
+    ARCHIVED
+}
+
+model Product {
+    id          String        @id @default(uuid())
+    name        String
+    slug        String        @unique
+    description String        @db.Text // متن طولانی
+    status      ProductStatus @default(DRAFT)
+
+    // قیمت پایه (برای نمایش در لیست، مثلا "شروع از ...")
+    basePrice Decimal @db.Decimal(10, 2)
+
+    // روابط
+    categoryId String
+    category   Category @relation(fields: [categoryId], references: [id])
+
+    vendorId String
+    vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+    variants ProductVariant[]
+    images   ProductImage[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([vendorId])
+    @@index([categoryId])
+    @@index([status])
+    @@map("products")
+}
+
+model ProductVariant {
+    id    String  @id @default(uuid())
+    sku   String  @unique // کد انبارداری یکتا
+    price Decimal @db.Decimal(10, 2)
+    stock Int     @default(0)
+
+    // ویژگی‌ها به صورت JSON ذخیره می‌شوند
+    // مثال: { "color": "red", "size": "XL", "material": "cotton" }
+    attributes Json
+
+    productId String
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("product_variants")
+}
+
+model ProductImage {
+    id     String  @id @default(uuid())
+    url    String
+    alt    String?
+    isMain Boolean @default(false) // عکس اصلی محصول
+    order  Int     @default(0) // ترتیب نمایش
+
+    productId String
+    product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@map("product_images")
+}
+
+// جدول برای مدیریت رفرش توکن‌ها (امنیت بالا)
+model RefreshToken {
+    id              String   @id @default(uuid())
+    token           String   @unique // هش توکن را ذخیره می‌کنیم
+    userId          String
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    expiresAt       DateTime
+    revoked         Boolean  @default(false) // برای ابطال دستی (Logout)
+    replacedByToken String? // برای Rotation (زنجیره توکن‌ها)
+
+    createdAt DateTime @default(now())
+
+    @@map("refresh_tokens")
+}
