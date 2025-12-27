@@ -1,4 +1,3 @@
-````markdown
 # 📱 Alogadget Platform
 
 An enterprise-level **Multi-Vendor E-commerce Platform** built with modern web technologies, focusing on **scalability**, **performance**, and **security**.
@@ -16,35 +15,34 @@ It features a robust backend architecture using **NestJS** within a **TurboRepo 
 
 ## 🌟 Key Features
 
-### 🔐 Security & Authentication
+### 🔐 Advanced Authentication
 - JWT-based authentication (Access & Refresh Tokens)
 - Argon2 password hashing
-- HttpOnly cookies for enhanced security
+- Secure HttpOnly cookies
 
-### 🛡️ Authorization
-- Role-Based Access Control (RBAC)
-- Granular permissions for **Admins**, **Vendors**, and **Customers**
+### 🛡️ RBAC (Role-Based Access Control)
+- Granular permission system
+- Roles: **Admin**, **Vendor**, **Customer**
 
 ### 📦 Advanced Product Catalog
-- Recursive nested categories
-- Product variants (Color / Size combinations)
-- Dynamic product attributes using **JSONB**
+- Nested categories (recursive structure)
+- Product variants (e.g., color / size combinations)
+- Dynamic attributes using **PostgreSQL JSONB**
 
 ### 🏪 Multi-Vendor System
-- Vendor onboarding
-- Approval workflows
-- Independent product management per vendor
+- Vendor onboarding & approval workflow
+- Vendor-level product management
 
 ### 🛒 Order Management
-- Atomic transactions
-- Concurrency-safe inventory locking
+- Atomic order transactions
+- Inventory locking & concurrency-safe processing
 
-### 🚀 Performance
+### 🚀 Performance Optimization
 - Redis caching for heavy endpoints (Categories, Products)
 
 ### 📂 File Management
-- Local file uploads using Multer
-- Ready for S3-compatible storage integration
+- Local file uploads using **Multer**
+- Architecture ready for **S3 / Cloud Storage** integration
 
 ---
 
@@ -56,14 +54,14 @@ It features a robust backend architecture using **NestJS** within a **TurboRepo 
 | Database | PostgreSQL 16, Prisma ORM |
 | Caching & Queues | Redis |
 | DevOps | Docker, Docker Compose |
-| Monorepo | TurboRepo, pnpm |
+| Monorepo Tool | TurboRepo, pnpm |
 | Testing | Jest (Unit & Integration) |
 
 ---
 
 ## 📂 Project Structure
 
-```text
+```bash
 alogadget-platform/
 ├── apps/
 │   ├── backend/        # NestJS API Server (Core Logic)
@@ -74,6 +72,7 @@ alogadget-platform/
 │   └── ui/             # Shared UI Components (Shadcn)
 ├── docker-compose.yml  # Infrastructure Setup
 └── pnpm-workspace.yaml # Workspace Configuration
+
 ````
 
 ---
